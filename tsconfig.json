@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "lib": ["dom", "esnext"],
+    "experimentalDecorators": true,
+    "sourceMap": true,
+    "noImplicitAny": true,
+    // "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "allowSyntheticDefaultImports": true,
+    "declaration": true,
+    "outDir": "./pkg/"
+  },
+  "include": ["./src/**/*"],
+}
