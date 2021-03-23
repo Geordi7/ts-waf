@@ -1,5 +1,6 @@
 
 import morphdom from 'morphdom';
+import { request } from 'node:http';
 import { Tag, Renderer, createRenderer } from './tag';
 
 export type StateTransition<S> = (s: S) => StateUpdateResult<S>;
@@ -35,6 +36,7 @@ type PrivateStateManager<S> = {
     trigger:  (s: S) => void,
     renderer: Renderer<S>,
     publicInterface: StateManager<S>,
+    requestedFrame: number,
 }
 
 export type StateManager<S> = {
@@ -45,6 +47,7 @@ export type StateManager<S> = {
 const initPrivateStateManager = <S>(start: S): PrivateStateManager<S> => {
     let sm: PrivateStateManager<S> = {
         state: start,
+        requestedFrame: 0,
         trigger: (s: S) => {s;},
         renderer: createRenderer(
             (h: StateEventTransition<S>) =>
@@ -61,15 +64,22 @@ const initPrivateStateManager = <S>(start: S): PrivateStateManager<S> => {
                     res.then(sm.publicInterface.update);
                 } else if ('now' in res && 'later' in res) {
                     sm.state = res.now;
-                    sm.trigger(sm.state);
+                    renderNextFrame(sm);
                     res.later.then(sm.publicInterface.update);
                 } else {
                     sm.state = res;
-                    sm.trigger(sm.state);
+                    renderNextFrame(sm);
                 }
             }
         }
     };
 
     return sm;
+}
+
+const renderNextFrame = <S>(sm: PrivateStateManager<S>): void => {
+    if (sm.requestedFrame) {
+    } else {
+        sm.requestedFrame = requestAnimationFrame(() => sm.trigger(sm.state));
+    }
 }

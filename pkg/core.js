@@ -20,6 +20,7 @@ export function mount(el, vi, st) {
 const initPrivateStateManager = (start) => {
     let sm = {
         state: start,
+        requestedFrame: 0,
         trigger: (s) => { s; },
         renderer: createRenderer((h) => (e) => {
             console.log('event');
@@ -35,16 +36,23 @@ const initPrivateStateManager = (start) => {
                 }
                 else if ('now' in res && 'later' in res) {
                     sm.state = res.now;
-                    sm.trigger(sm.state);
+                    renderNextFrame(sm);
                     res.later.then(sm.publicInterface.update);
                 }
                 else {
                     sm.state = res;
-                    sm.trigger(sm.state);
+                    renderNextFrame(sm);
                 }
             }
         }
     };
     return sm;
+};
+const renderNextFrame = (sm) => {
+    if (sm.requestedFrame) {
+    }
+    else {
+        sm.requestedFrame = requestAnimationFrame(() => sm.trigger(sm.state));
+    }
 };
 //# sourceMappingURL=core.js.map
